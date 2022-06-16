@@ -1,23 +1,38 @@
-const express = require("express");
-const morgan = require("morgan");
-
-const tourRouter = require("./routes/tourRoutes");
-const userRouter = require("./routes/userRoutes");
-
+const express = require('express');
+const morgan = require('morgan');
 const app = express();
 
-
-//    1) Middlewares
-console.log(process.env.NODE_ENV);
-if (process.env.NODE_ENV === "development") {
-  app.use(morgan("dev"));
-}
-
-app.use(express.json()); // middleware btn req and response
+//middle wear
+app.use(morgan('dev'));
+app.use(express.json());
 app.use(express.static(`${__dirname}/public`));
 
 app.use((req, res, next) => {
-  console.log("Hello from the middleware");
+  console.log('Hello from kampala middlewear');
+  next();
+});
+
+const tourRouter = require('./routes/tourRoutes');
+const userRouter = require('./routes/userRoutes');
+
+// 3) Routes
+
+// const userRouter = express.Router();
+
+//    1) Middlewares
+console.log(process.env.NODE_ENV);
+
+if (process.env.NODE_ENV === 'development') {
+  app.use(morgan('dev'));
+}
+
+app.use(express.json()); // middleware btn req and response
+
+// app.use(express.static(`${__dirname}/public`));
+
+app.use((req, res, next) => {
+  console.log('Hello from the middleware 💥');
+
   next();
 });
 
@@ -26,8 +41,8 @@ app.use((req, res, next) => {
   next();
 });
 
-// 3) Routes
-app.use("/api/v1/tours", tourRouter);
-app.use("/api/v1/users", userRouter);
+// ++++++++++++++++++++++This is where we mount our routers++++++++++++++++++++
+app.use('/api/v1/tours', tourRouter);
+app.use('/api/v1/users', userRouter);
 
 module.exports = app;
