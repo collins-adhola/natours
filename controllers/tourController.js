@@ -1,47 +1,52 @@
-const fs = require('fs');
+const Tour = require('./../models/tourModel'); // got from model going to be controlled
 
-const tours = JSON.parse(
-  fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`)
-);
+// ++++import model from files
+// const tours = JSON.parse(
+//   fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`)
+// );
 
-exports.checkID = (req, res, next, val) => {
-  if (req.params.id * 1 > tours.length) {
-    return res.status(404).json({
-      status: 'fail',
-      message: 'Invalid ID',
-    });
-  }
-  next();
-};
-
-exports.checkBody = (req, res, next) => {
-  if (!req.body.name || !req.body.price) {
-    return res.status(400).json({
-      status: 'fail',
-      message: 'Missing name or price',
-    });
-  }
-  next();
-};
+// exports.checkID = (req, res, next, val) => {
+//   if (req.params.id * 1 > tours.length) {
+//     return res.status(404).json({
+//       status: 'fail',
+//       message: 'Invalid ID',
+//     });
+//   }
+//   next();
+// };
 
 // const Tour = require('./../models/tourModel');
 
 // 2) Route handlers
 exports.getAllTours = async (req, res) => {
   try {
-    const tour = await tours.find();
- 
+    // BUILD QUERY
+    const queryObj = { ...req.query };
+    const excludedFields = ['page', 'sort', 'limit', 'fields'];
+    excludedFields.forEach((el) => delete queryObj[el]);
 
+    const query = Tour.find(queryObj);
+
+    // const query =  Tour.find()
+    //   .where('duration')
+    //   .equals(5)
+    //   .where('difficulty')
+    //   .equals('easy');
+
+    // EXECUTE QUERY
+    const tours = await query;
+
+    //SEND RESPONSE
     res.status(200).json({
       status: 'success',
       results: tours.length,
       data: {
-        tour,
+        tours,
       },
     });
   } catch (err) {
     res.status(404).json({
-      status: 'faile',
+      status: 'fail',
       message: err,
     });
   }
@@ -49,7 +54,8 @@ exports.getAllTours = async (req, res) => {
 
 exports.getTour = async (req, res) => {
   try {
-    const tour = await tours.findById(req.params.id);
+    const tour = await Tour.findById(req.params.id);
+    //Tour.findOne({_id:req.params.id})  // same to above
 
     res.status(200).json({
       status: 'success',
@@ -67,12 +73,10 @@ exports.getTour = async (req, res) => {
 
 exports.createTour = async (req, res) => {
   try {
-    //calling method on the document
     // const newTour = new Tour({})
     // newTour.save();
-
-    //calling method on the object is better
-    const newTour = await tours.create(req.body);
+    //calling create method on the object is better
+    const newTour = await Tour.create(req.body); //calling Tour omdel and passing data from post body
 
     res.status(201).json({
       status: 'success',
@@ -83,14 +87,16 @@ exports.createTour = async (req, res) => {
   } catch (err) {
     res.status(400).json({
       status: 'Fail',
-      message: ' Invalid data sent!',
+      message: err,
     });
   }
 };
 
+//++++++++++++++++Update Handler++++++++++++++++++++++++++++++
 exports.updateTour = async (req, res) => {
   try {
-    const tour = await tours.findByIdAndUpdate(req.params.id, req.body, {
+    const tour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
+      //id from req.body. check queries in mongoose -model
       new: true,
       runValidators: true,
     });
@@ -98,7 +104,7 @@ exports.updateTour = async (req, res) => {
     res.status(200).json({
       status: 'success',
       data: {
-        tour: tour,
+        tour,
       },
     });
   } catch (err) {
