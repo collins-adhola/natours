@@ -3,6 +3,7 @@ class APIFeatures {
     this.query = query;
     this.queryString = queryString;
   }
+
   filter() {
     const queryObj = { ...this.queryString };
 
@@ -42,6 +43,7 @@ class APIFeatures {
     }
     return this;
   }
+
   paginate() {
     const page = this.queryString.page * 1 || 1;
 
@@ -56,4 +58,4 @@ class APIFeatures {
     return this;
   }
 }
- module.exports = APIFeatures;
+module.exports = APIFeatures;
