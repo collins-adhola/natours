@@ -2,9 +2,11 @@ const express = require('express');
 const morgan = require('morgan');
 
 const AppError = require('./utils/appError');
-const globalErrorHandler = require('./controllers/errorController')
+const globalErrorHandler = require('./controllers/errorController');
 const tourRouter = require('./routes/tourRoutes');
+
 const userRouter = require('./routes/userRoutes');
+
 const app = express();
 
 // MIDDLEWARES
@@ -21,7 +23,8 @@ app.use((req, res, next) => {
 // const userRouter = express.Router();
 
 //    1) Middlewares
-console.log (process.env.NODE_ENV);
+// eslint-disable-next-line no-console
+console.log(process.env.NODE_ENV);
 
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
